@@ -254,7 +254,7 @@
         document.getElementById('errorMsg').style.display = 'none';
     });
 
-    const contactHTML = `<div class="contact-line">📞 Contact hiring manager: Sandhya – 9004931558</div>`;
+    const contactHTML = `<div class="contact-line">📞 Contact hiring manager: Anita – 8104478865</div>`;
     const opportunityHTML = `
         <div class="opportunity-card">
             <h3>🌟 Opportunity – Home Blood Sample Collection with Second Medic (Thyrocare) 🌟</h3>
@@ -391,12 +391,12 @@
                     body: JSON.stringify(formData)
                 });
                 const waMessage = `🩸 *New Phlebotomist Application*%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${phone}%0A*Pincode:* ${pincode}%0A*Experience:* ${experience} years%0A*Vacutainer:* ${vacutainerExp}%0A*Qualification:* ${qualification}%0A*Equipment:* ${encodeURIComponent(equipment) || "None"}`;
-                const waLink = `https://wa.me/919004931558?text=${waMessage}`;
+                const waLink = `https://wa.me/918104478865?text=${waMessage}`;
                 window.location.href = waLink;
                 document.getElementById('formStatus').innerHTML = '<div class="thankyou">✅ Application submitted! Redirecting to WhatsApp...</div>';
             } catch (err) {
                 console.error(err);
-                document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Sandhya directly.</div>';
+                document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Anita directly.</div>';
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✅ Submit Application';
             }
