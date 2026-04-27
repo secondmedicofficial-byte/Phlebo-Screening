@@ -439,7 +439,6 @@
             dynamicDiv.innerHTML = opportunityHTML;
             showScreeningForm(pincode);
         } else {
-            // 🟢 FIXED: No contact line for not eligible candidates
             resultDiv.innerHTML = `<div class="result not-eligible">❌ We are not hiring in ${pincode}</div>`;
             dynamicDiv.innerHTML = '';
         }
