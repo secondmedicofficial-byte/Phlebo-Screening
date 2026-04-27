@@ -374,7 +374,7 @@
             showScreeningForm(pincode);
         } else if (prefix5Set.has(pincode.substring(0,5))) {
             const first5 = pincode.substring(0,5);
-            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}XX).<br>${contactHTML}</div>`;
+            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}X).<br>${contactHTML}</div>`;
             dynamicDiv.innerHTML = opportunityHTML;
             showScreeningForm(pincode);
         } else {
