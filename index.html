@@ -162,14 +162,6 @@
             border-radius: 40px;
             text-align: center;
         }
-        .thankyou {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 24px;
-            margin-top: 1rem;
-            text-align: center;
-        }
         .note {
             font-size: 0.8rem;
             color: #b45f1b;
@@ -244,7 +236,6 @@
             statsDiv.innerHTML = '⚠️ Failed to load pincodes. Please refresh or try again later.';
         }
     }
-
     loadPincodes();
     // =====================================================================
 
@@ -255,6 +246,7 @@
     });
 
     const contactHTML = `<div class="contact-line">📞 Contact hiring manager: Sandhya – 9004931558</div>`;
+
     const opportunityHTML = `
         <div class="opportunity-card">
             <h3>🌟 Opportunity – Home Blood Sample Collection with Second Medic (Thyrocare) 🌟</h3>
@@ -271,28 +263,31 @@
         </div>
     `;
 
+    // IMPORTANT: Replace with your Google Apps Script Web App URL (the one you'll deploy after step 2)
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
     const screeningFormHTML = `
         <div class="screening-form" id="screeningFormContainer">
             <h3>📝 Apply for this position</h3>
-            <form id="candidateForm">
+            <form action="${APPS_SCRIPT_URL}" method="POST" enctype="multipart/form-data" id="candidateForm">
                 <div class="form-row">
                     <div class="form-group">
                         <label>Full Name *</label>
-                        <input type="text" id="fullName" required>
+                        <input type="text" name="fullName" required>
                     </div>
                     <div class="form-group">
                         <label>Phone Number (10 digits) *</label>
-                        <input type="tel" id="phone" maxlength="10" inputmode="numeric" required>
+                        <input type="tel" name="phone" maxlength="10" inputmode="numeric" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Years of Phlebotomy Experience *</label>
-                        <input type="number" step="0.5" id="experience" required>
+                        <input type="number" step="0.5" name="experience" required>
                     </div>
                     <div class="form-group">
                         <label>Vacutainer Experience? *</label>
-                        <select id="vacutainerExp" required>
+                        <select name="vacutainerExp" required>
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
@@ -301,7 +296,7 @@
                 </div>
                 <div class="form-group">
                     <label>Qualification *</label>
-                    <select id="qualification" required>
+                    <select name="qualification" required>
                         <option value="">Select</option>
                         <option value="DMLT">DMLT</option>
                         <option value="MLT">MLT</option>
@@ -313,13 +308,18 @@
                 <div class="form-group">
                     <label>Equipment you own (can select multiple):</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" value="Bike/Scooter"> Bike/Scooter</label>
-                        <label><input type="checkbox" value="Refrigerator"> Refrigerator</label>
-                        <label><input type="checkbox" value="Centrifuge"> Centrifuge</label>
-                        <label><input type="checkbox" value="Android phone"> Android phone</label>
+                        <label><input type="checkbox" name="equipment" value="Bike/Scooter"> Bike/Scooter</label>
+                        <label><input type="checkbox" name="equipment" value="Refrigerator"> Refrigerator</label>
+                        <label><input type="checkbox" name="equipment" value="Centrifuge"> Centrifuge</label>
+                        <label><input type="checkbox" name="equipment" value="Android phone"> Android phone</label>
                     </div>
                 </div>
-                <input type="hidden" id="submittedPincode" value="">
+                <div class="form-group">
+                    <label>Upload Resume / Certificate (PDF, DOC, JPG) *</label>
+                    <input type="file" name="resume" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                    <small style="color: #6c86a3;">Max 10 MB</small>
+                </div>
+                <input type="hidden" name="pincode" id="submittedPincode" value="">
                 <button type="submit" id="submitBtn">✅ Submit Application</button>
                 <div class="note" style="margin-top: 12px;">📌 We pay you order wise, not fixed salary.</div>
             </form>
@@ -331,76 +331,14 @@
         const dynamicDiv = document.getElementById('dynamicContent');
         dynamicDiv.innerHTML = screeningFormHTML;
         document.getElementById('submittedPincode').value = pincode;
-        attachFormSubmit();
-        const phoneInput = document.getElementById('phone');
+
+        // Phone number 10-digit restriction
+        const phoneInput = document.querySelector('#candidateForm input[name="phone"]');
         if (phoneInput) {
             phoneInput.addEventListener('input', (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0,10);
             });
         }
-    }
-
-    function attachFormSubmit() {
-        const form = document.getElementById('candidateForm');
-        if (!form) return;
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-
-            const name = document.getElementById('fullName').value.trim();
-            let phone = document.getElementById('phone').value.trim();
-            const experience = document.getElementById('experience').value;
-            const vacutainerExp = document.getElementById('vacutainerExp').value;
-            const qualification = document.getElementById('qualification').value;
-            const equipment = Array.from(document.querySelectorAll('#candidateForm input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
-            const pincode = document.getElementById('submittedPincode').value;
-
-            if (phone.length !== 10) {
-                document.getElementById('formStatus').innerHTML = '<div class="error">Phone number must be exactly 10 digits.</div>';
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✅ Submit Application';
-                return;
-            }
-            if (!name || !phone || !experience || !vacutainerExp || !qualification) {
-                document.getElementById('formStatus').innerHTML = '<div class="error">Please fill all required fields.</div>';
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✅ Submit Application';
-                return;
-            }
-
-            const formData = {
-                timestamp: new Date().toISOString(),
-                pincode: pincode,
-                name: name,
-                phone: phone,
-                experience_years: experience,
-                vacutainer_experience: vacutainerExp,
-                qualification: qualification,
-                equipment: equipment
-            };
-
-            const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxOt1OXB7aQsmaMYPYpapd2CKAxtQkkKRPWbfa_I_luIRBe38rLIGl9t9sI64hy0qaJ/exec";
-
-            try {
-                await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-                const waMessage = `🩸 *New Phlebotomist Application*%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${phone}%0A*Pincode:* ${pincode}%0A*Experience:* ${experience} years%0A*Vacutainer:* ${vacutainerExp}%0A*Qualification:* ${qualification}%0A*Equipment:* ${encodeURIComponent(equipment) || "None"}`;
-                const waLink = `https://wa.me/919004931558?text=${waMessage}`;
-                window.location.href = waLink;
-                document.getElementById('formStatus').innerHTML = '<div class="thankyou">✅ Application submitted! Redirecting to WhatsApp...</div>';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Sandhya directly.</div>';
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✅ Submit Application';
-            }
-        });
     }
 
     function checkPincode() {
@@ -428,6 +366,7 @@
             return;
         }
         errorDiv.style.display = "none";
+
         const pincode = rawInput;
         if (exactSet.has(pincode)) {
             resultDiv.innerHTML = `<div class="result eligible">✅ Eligible – We are hiring in ${pincode}<br>${contactHTML}</div>`;
