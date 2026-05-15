@@ -340,7 +340,6 @@
         }
     }
 
-    // ✅ CORRECTED fetch without 'no-cors'
     function attachFormSubmit() {
         const form = document.getElementById('candidateForm');
         if (!form) return;
@@ -385,28 +384,18 @@
             const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxOt1OXB7aQsmaMYPYpapd2CKAxtQkkKRPWbfa_I_luIRBe38rLIGl9t9sI64hy0qaJ/exec";
 
             try {
-                // ✅ Removed mode: 'no-cors' and added proper response handling
-                const response = await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+                await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Server responded with ${response.status}`);
-                }
-
-                const result = await response.text();
-                console.log("Server response:", result);
-
-                // If successful, redirect to WhatsApp
                 const waMessage = `🩸 *New Phlebotomist Application*%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${phone}%0A*Pincode:* ${pincode}%0A*Experience:* ${experience} years%0A*Vacutainer:* ${vacutainerExp}%0A*Qualification:* ${qualification}%0A*Equipment:* ${encodeURIComponent(equipment) || "None"}`;
                 const waLink = `https://wa.me/919004931558?text=${waMessage}`;
                 window.location.href = waLink;
-
                 document.getElementById('formStatus').innerHTML = '<div class="thankyou">✅ Application submitted! Redirecting to WhatsApp...</div>';
             } catch (err) {
-                console.error("Fetch error:", err);
+                console.error(err);
                 document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Sandhya directly.</div>';
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✅ Submit Application';
@@ -446,7 +435,7 @@
             showScreeningForm(pincode);
         } else if (prefix5Set.has(pincode.substring(0,5))) {
             const first5 = pincode.substring(0,5);
-            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}XX).<br>${contactHTML}</div>`;
+            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}X).<br>${contactHTML}</div>`;
             dynamicDiv.innerHTML = opportunityHTML;
             showScreeningForm(pincode);
         } else {
