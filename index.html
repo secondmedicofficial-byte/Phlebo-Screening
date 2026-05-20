@@ -229,7 +229,7 @@
         const statsDiv = document.getElementById('statsInfo');
         statsDiv.innerHTML = '📡 Loading pincodes from server...';
         try {
-            const GIST_URL = 'https://gist.githubusercontent.com/secondmedicofficial-byte/7174ab643430eb6af710de761bdd24f5/raw/pincodes.json';
+            const GIST_URL = 'https://gist.github.com/secondmedicofficial-byte/4b57fee23aeffb0c89fd841e68b31f5c/revisions';
             const response = await fetch(GIST_URL);
             if (!response.ok) throw new Error('Failed to fetch pincodes');
             const pincodes = await response.json();
