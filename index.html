@@ -221,30 +221,21 @@
 
 <script>
     // ==================== PINCODE DATA FROM YOUR GIST ====================
-    let exactSet = new Set();
-    let prefix5Set = new Set();
-    let pincodesLoaded = false;
-
-    async function loadPincodes() {
-        const statsDiv = document.getElementById('statsInfo');
-        statsDiv.innerHTML = '📡 Loading pincodes from server...';
-        try {
-            const GIST_URL = 'https://gist.githubusercontent.com/secondmedicofficial-byte/764d0df8e06725cb6006e071f4d14a05/raw/0a4b56a8bcb3c0b7928a621d6275d4badecf67e4/gistfile1.txt';
-            const response = await fetch(GIST_URL);
-            if (!response.ok) throw new Error('Failed to fetch pincodes');
-            const pincodes = await response.json();
-            exactSet = new Set(pincodes);
-            for (let p of pincodes) {
-                if (p.length >= 5) prefix5Set.add(p.substring(0,5));
-            }
-            pincodesLoaded = true;
-            statsDiv.innerHTML = `📍 ${exactSet.size} active locations loaded | 5‑digit nearby matching enabled`;
-        } catch (err) {
-            console.error(err);
-            statsDiv.innerHTML = '⚠️ Failed to load pincodes. Please refresh or try again later.';
-        }
+  fetch('pincodes.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Network response was not ok: ${response.status}`);
     }
-
+    return response.json();
+  })
+  .then(pincodes => {
+    console.log('Data loaded successfully:', pincodes);
+    // Process your pincodes here
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+    
     loadPincodes();
     // =====================================================================
 
