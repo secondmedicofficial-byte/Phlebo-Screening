@@ -220,22 +220,31 @@
 </div>
 
 <script>
-    // ==================== PINCODE DATA FROM YOUR GIST ====================
-  fetch('pincodes.json')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
+    // ==================== PINCODE DATA ====================
+    let exactSet = new Set();
+    let prefix5Set = new Set();
+    let pincodesLoaded = false;
+
+    async function loadPincodes() {
+        const statsDiv = document.getElementById('statsInfo');
+        statsDiv.innerHTML = '📡 Loading pincodes from server...';
+        try {
+            // Fetch from the local pincodes.json file in the same folder
+            const response = await fetch('pincodes.json');
+            if (!response.ok) throw new Error('Failed to fetch pincodes');
+            const pincodes = await response.json();
+            exactSet = new Set(pincodes);
+            for (let p of pincodes) {
+                if (p.length >= 5) prefix5Set.add(p.substring(0,5));
+            }
+            pincodesLoaded = true;
+            statsDiv.innerHTML = `📍 ${exactSet.size} active locations loaded | 5‑digit nearby matching enabled`;
+        } catch (err) {
+            console.error(err);
+            statsDiv.innerHTML = '⚠️ Failed to load pincodes. Please refresh or try again later.';
+        }
     }
-    return response.json();
-  })
-  .then(pincodes => {
-    console.log('Data loaded successfully:', pincodes);
-    // Process your pincodes here
-  })
-  .catch(error => {
-    console.error('There was a problem with the fetch operation:', error);
-  });
-    
+
     loadPincodes();
     // =====================================================================
 
@@ -245,7 +254,7 @@
         document.getElementById('errorMsg').style.display = 'none';
     });
 
-    const contactHTML = `<div class="contact-line">📞 Contact hiring manager: Sandhaya  – 9004931558</div>`;
+    const contactHTML = `<div class="contact-line">📞 Contact hiring manager: Sandhya – 9004931558</div>`;
     const opportunityHTML = `
         <div class="opportunity-card">
             <h3>🌟 Opportunity – Home Blood Sample Collection with Second Medic (Thyrocare) 🌟</h3>
@@ -375,6 +384,7 @@
             const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxOt1OXB7aQsmaMYPYpapd2CKAxtQkkKRPWbfa_I_luIRBe38rLIGl9t9sI64hy0qaJ/exec";
 
             try {
+                // Use 'no-cors' as before, but it's not ideal. For now keep it.
                 await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -387,7 +397,7 @@
                 document.getElementById('formStatus').innerHTML = '<div class="thankyou">✅ Application submitted! Redirecting to WhatsApp...</div>';
             } catch (err) {
                 console.error(err);
-                document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Sandhaya  directly.</div>';
+                document.getElementById('formStatus').innerHTML = '<div class="error">Submission failed. Please try again or contact Sandhya directly.</div>';
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✅ Submit Application';
             }
@@ -426,7 +436,7 @@
             showScreeningForm(pincode);
         } else if (prefix5Set.has(pincode.substring(0,5))) {
             const first5 = pincode.substring(0,5);
-            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}X).<br>${contactHTML}</div>`;
+            resultDiv.innerHTML = `<div class="result nearby">📍 Not eligible in ${pincode}, but we have openings nearby (first 5 digits: ${first5}XX).<br>${contactHTML}</div>`;
             dynamicDiv.innerHTML = opportunityHTML;
             showScreeningForm(pincode);
         } else {
